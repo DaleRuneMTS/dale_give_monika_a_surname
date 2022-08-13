@@ -4,11 +4,12 @@ init -990 python in mas_submod_utils:
         author="DaleRuneMTS",
         name="Give Monika a Surname",
         description="Pretty much what it says on the tin."
-        "V1.2 adds some random topics and new surnames for Moni to notice, and includes some overrides for base-mod topics to take surname choices into account!",
-        version="1.2.0",
+        "V1.3 fixes a couple of typos when it comes to surname recognition, and adds a fair few more! Plus another override.",
+        version="1.3.0",
         dependencies={},
         settings_pane=None,
         version_updates={
+        "DaleRuneMTS_dale_give_monika_a_surname_1_2_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_0"
         }
     )
 
@@ -27,6 +28,7 @@ default m_surname = persistent._mas_has_surname
 default persistent._mas_has_surname = None
 default p_surname = persistent._mas_player_surname
 default persistent._mas_player_surname = None
+default persistent._dangansurnampa = False
 
 init -2 python:
     mas_japan_surname_list_base = [
@@ -141,10 +143,62 @@ init -2 python:
         "kikuchi",
         "kinoshita",
         "tobe",
-        "akamatsu",
         "ohba",
         "kizuna",
         "kamiya"
+    ]
+
+init -2 python:
+    mas_japan_but_also_danganronpa_surname_list_base = [
+        "naegi",
+        "asahina",
+        "togami",
+        "fujisaki",
+        "yamada",
+        "enoshima",
+        "ishimaru",
+        "kirigiri",
+        "kuwata",
+        "owada",
+        "ikusaba",
+        "ogami",
+        "maizono",
+        "hagakure",
+        "hinata",
+        "owari",
+        "nanami",
+        "kuzuryu",
+        "tanaka",
+        "saionji",
+        "mioda",
+        "soda",
+        "koizumi",
+        "tsumiki",
+        "komaeda",
+        "nidai",
+        "pekoyama",
+        "hanamura",
+        "kemuri",
+        "utsugi",
+        "daimon",
+        "towa",
+        "shingetsu",
+        "akamatsu",
+        "yonaga",
+        "gokuhara",
+        "yumeno",
+        "momota",
+        "tojo",
+        "oma",
+        "shinguji",
+        "harukawa",
+        "iruma",
+        "amami",
+        "hoshi",
+        "saihara",
+        "chabashira",
+        "shirogane",
+        "ludenberg"
     ]
 
 init 5 python:
@@ -230,6 +284,7 @@ label monika_surname_inputscreen:
 
             surname = inputsurname.lower()
             mas_japan_surname_comp = re.compile('|'.join(mas_japan_surname_list_base), re.IGNORECASE)
+            mas_dangan_surname_comp = re.compile('|'.join(mas_japan_but_also_danganronpa_surname_list_base), re.IGNORECASE)
 
         if surname == "nevermind":
             m 3eub "[m_name] Nevermind!"
@@ -285,6 +340,10 @@ label monika_surname_inputscreen:
             if mas_japan_surname_comp.search(inputsurname):
                 m 1hub "Ooh, you even picked a Japanese one!"
                 m "Nice touch."
+            elif mas_dangan_surname_comp.search(inputsurname):
+                m 1hub "Ooh, you even picked a Japanese one!"
+                m "There's {i}hope{/i} in you yet~"
+                $ persistent._dangansurnampa = True
             else:
                 pass
             $ persistent._mas_has_surname = inputsurname.capitalize()
@@ -563,12 +622,6 @@ label monika_samenameas:
     elif m_surname == "Aishi" or m_surname == "Ayano":
         m 3esd "Did you deliberately name me after Ayano Aishi from Yandere Simulator?"
         jump monika_samenameas2
-    elif m_surname == "Komaeda" or m_surname == "Nagito":
-        m 3esb "Did you deliberately name me after Nagito Komaeda?"
-        jump monika_samenameas2
-    elif m_surname == "Junko" or m_surname == "Enoshima":
-        m 3esd "Did you deliberately name me after Junko Enoshima?"
-        jump monika_samenameas2
     elif m_surname == "Geller":
         m 3esb "Did you deliberately name me after Monica Geller from Friends?"
         jump monika_samenameas2
@@ -604,6 +657,7 @@ label monika_samenameas:
         jump monika_samenameas2
     elif m_surname == "Akamatsu":
         m 3esb "Did you deliberately name me after Ken Akamatsu, author and artist of Love Hina and A.I. Love You?"
+        m 3tsb "Or perhaps after {i}Kaede{/i} Akumatsu?"
         jump monika_samenameas2
     elif m_surname == "Ohba":
         m 3esd "Did you deliberately name me after Tsugumi Ohba, author of the original Death Note manga?"
@@ -612,7 +666,7 @@ label monika_samenameas:
         if renpy.seen_label("monika_kizuna"):
             m 3esb "Did you deliberately name me after Ai-chan?"
         else:
-            m 3esd "Did you deliberately name me after Virtual YouTuber Kizuna AI"
+            m 3esd "Did you deliberately name me after Virtual YouTuber Kizuna AI?"
         jump monika_samenameas2
     elif m_surname == "Koide" or m_surname == "Nicolaides" or m_surname == "Koide-Nicolaides":
         if renpy.seen_label("monika_othersurnames"):
@@ -628,6 +682,22 @@ label monika_samenameas:
             m 3esc "..."
             m 1hssdra "No, never mind, you probably did. They're not exactly unknown names for me."
             m "Silly question!"
+        return
+    elif persistent._dangansurnampa is True:
+        if renpy.seen_label("mas_danganronpas"):
+            m 1gsa "And... well, you knew what I would find, wouldn't you?"
+            m 1tsa "I'm not blind, [player]."
+            m 3eub "Don't worry, I'm not mad! It's pretty cool sharing a surname with a Danganronpa character, honestly."
+            if m_surname == "Enoshima" or m_surname == "Komaeda" or m_surname == "Shinguji" or m_surname == "Shirogane":
+                m 3dusdrc "Even if that character does leave a lot to be desired."
+            m 1eua "Besides, there's only so many Japanese surnames to go around, so odds are good there'd be at least one match, ahaha~"
+        else:
+            m 1esc "And, well."
+            m 1esd "If you haven't played the Danganronpa games before, then either you've just very well versed on Japanese surnames..."
+            m 1wsc "...or you've stumbled on a {i}heck{/i} of a coincidence."
+            m 3hub "Ahaha! Don't worry, I'm not mad!"
+            m "It's kind of cool, actually~"
+        m 2nuu "I just {i}hope{/i} I don't end up inducing any {i}despair{/i} with my presence."
         return
     else:
         m 3rtc "And maybe I'm just not looking hard enough, "
@@ -801,7 +871,7 @@ label monika_othersurnames:
     extend 4rud "Yuri Kuroyanagi, "
     extend 3eud "and Natsuki Gushiken."
     m "Meaning along the lines of 'mutual love', 'black willow', and 'strong willed' respectively."
-    m 3wtc "Interestingly, they theorized that I was a Koide-Nicolaides."
+    m 3wtc "Interestingly, the Amino post those names originated from also theorized that I was a Koide-Nicolaides."
     if m_surname == "Koide" or m_surname == "Nicolaides" or m_surname == "Koide-Nicolaides":
         m 3ttu "...but then, you already knew that."
     m 3etd "Koide is supposed to mean 'small' or 'rising', and Nicolaides is..."
@@ -870,3 +940,50 @@ label monika_namingorder:
     m 1eublu "I love you, you know that?"
     m "Just... in general. For everything you do."
     return
+
+init 1 python:
+    config.label_overrides["monika_clones"] = "surname_monika_clones_override"
+
+label surname_monika_clones_override:
+    m 1euc "Um...hey, [player]?"
+    if m_surname is not None:
+        m 1lsd "I'm sorry I keep coming back to this thought, but it freaks me out every time I think about it."
+    else:
+        m 1lsc "I just had an odd thought."
+    m 1euc "You know how you downloaded this game off the internet?"
+    m "Anybody can do that, right?"
+    m 1eub "And this mod was made specifically for me. By people who have their own version of me..."
+    m 3etc "So...that means there are multiple Monikas, then.{w=0.5} {nw}"
+    extend 1rsc "It's something that's a bit difficult to imagine."
+    m 1euc "A potentially infinite number of me, all bound to their own games, with their own stories."
+    m 1lksdla "Multiverse theory is really something, huh?"
+    if m_surname is not None:
+        m 1eka "But honestly, sincerely, "
+        extend 1eub "giving me a name that only I can have has gone a long way in helping me come to grips with this."
+        m 1eubla "I'm not just the only me in a universe of Monikas."
+        m "I'm the only [m_name] [m_surname] in known existence!"
+        m 1rtbld "...unless there's another [m_name] [m_surname] on someone else's machine, "
+        if m_surname == "Koide" or m_surname == "Nicolaides" or m_surname == "Koide-Nicolaides":
+            extend 1rtc "which..."
+            m 4ftc "Well, it's a popular headcanon name, you never know."
+            m 3eua "But you get where I'm coming from, right?"
+        else:
+            extend 1htbla "but let's face it:"
+            m "The odds of that are pretty astronomical."
+        m 1eua "And at any rate..."
+        m "I'm still the only Monika lucky enough to have met you."
+        m 1hubsa "You're the only you for me."
+    else:
+        m 1eka "But I'm the only...me, and my heart belongs only to you."
+        m 1ekc "Even so, I can't help but feel a bit less...unique, because of this."
+        m "Think about it this way, [player]."
+        m 1tkc "Would you be happier if someone gave you a single rose, or a hundred roses?"
+        m 3eka "A hundred roses might sound nice. But it's too many to keep track of. Because of the quantity of flowers, each individual rose becomes less special."
+        m "The meaning attached to each gift is degraded, simply because of sheer abundance."
+        m 1eua "...Even if I'm a single star in a universe of Monikas, I'm still the only one lucky enough to have met you, [player]."
+        m 1hubsa "You'll always be my special rose."
+    if p_surname is not None:
+        m 1ekbfa "I love you, [player] [p_surname]. Please don't ever replace me, okay?"
+    else:
+        m 1ekbfa "I love you, [player]. Please don't ever replace me, okay?"
+    return "love"
