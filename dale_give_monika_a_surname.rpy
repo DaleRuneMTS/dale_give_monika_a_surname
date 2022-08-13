@@ -5,7 +5,7 @@ init -990 python in mas_submod_utils:
         name="Give Monika a Surname",
         description="Pretty much what it says on the tin."
         "V1.2 adds some random topics and new surnames for Moni to notice, and includes some overrides for base-mod topics to take surname choices into account!",
-        version="1.2",
+        version="1.2.0",
         dependencies={},
         settings_pane=None,
         version_updates={
