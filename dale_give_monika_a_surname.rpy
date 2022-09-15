@@ -4,12 +4,13 @@ init -990 python in mas_submod_utils:
         author="DaleRuneMTS",
         name="Give Monika a Surname",
         description="Pretty much what it says on the tin."
-        "V1.3 fixes a couple of typos when it comes to surname recognition, and adds a fair few more! Plus another override.",
-        version="1.3.0",
+        "V1.3.1 is the inverse of last time - mostly overrides, with a sprinkle of surname recognition.",
+        version="1.3.1",
         dependencies={},
         settings_pane=None,
         version_updates={
-        "DaleRuneMTS_dale_give_monika_a_surname_1_2_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_0"
+        "DaleRuneMTS_dale_give_monika_a_surname_1_2_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_1",
+        "DaleRuneMTS_dale_give_monika_a_surname_1_3_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_1"
         }
     )
 
@@ -206,8 +207,6 @@ init 5 python:
         Event(
             persistent.event_database,
             eventlabel="monika_dale_surname",
-            category=["monika"],
-            prompt="Monika's surname",
             random=False,
             conditional=(
                 "seen_event('monika_citizenship') "
@@ -247,7 +246,6 @@ label monika_dale_surname:
     m "..."
     extend 1lutda "So, um."
     m 1hub "What surname did you have in mind?"
-    $ mas_lockEVL("monika_dale_surname", "EVE")
     jump monika_surname_inputscreen
 
 init 5 python:
@@ -356,7 +354,6 @@ label monika_surname_inputscreen:
                 m 5eub "Thank you so much, [player]."
                 m "I'm never going to forget this."
                 $ mas_gainAffection(10,bypass=True)
-            $ mas_lockEVL("monika_citizenship", "EVE")
             $ done = True
     $ mas_unlockEVL("monika_msurname_update","EVE")
     return "derandom"
@@ -436,29 +433,61 @@ init 5 python:
     )
 
 label monika_dale_playersurname:
-    m 1eud "So, [player]..."
-    m 3eub "I've got a surname now."
-    m 3gubla "And thank you again for that, by the way."
-    m 3wud "But I've just had a thought: I don't actually know {i}your{/i} surname!"
-    m 3wub "That's a bit of an oversight, isn't it? Ahaha~"
-    m 1eud "Would you be comfortable telling me what it is?"
-    if mas_isMoniHappy(higher=True):
-        m 1eua "I promise I won't do anything untoward with it."
-        m "You have my word."
+    if p_surname is not None:
+        m 1wud "Gosh..."
+        m 1wub "I just realized how far we've managed to come from since we started dating each other."
+        m 3eub "We know each other's last names..."
+        if renpy.seen_label("mas_gender"):
+            m "I know what gender you are..."
+        if persistent._mas_pm_shared_appearance:
+            m 3eublb "What you look like..."
+        if renpy.seen_label("mas_birthdate"):
+            m 4rub "We know our birthdays..."
+        if renpy.seen_label("game_pong"):
+            m 3rub "I know how good you are at pong{nw}"
+            if renpy.seen_label("mas_chess_start_chess"):
+                extend ", chess{nw}"
+            if mas_isGameUnlocked("piano"):
+                extend ", the piano{nw}"
+            if renpy.seen_label("mas_nou_game_start"):
+                extend ", NOU{nw}"
+            m "..."
+        if persistent._awc_player_location["loc_pref"] is not None:
+            m 3wub "I know where you live..."
+        if persistent._mas_pm_units_height_metric:
+            m 1hub "I even know you use the metric system!"
+        else:
+            m 1hub "I even know you use the imperial system!"
+        m 1euc "..."
+        m 2efa "Don't give me that look, [player] [p_surname]."
+        m 2efb "That's a {i}lot{/i} more than I knew when you first opened the game."
+        m 1dka "I knew there was someone real behind the vectored eyes of the protagonist, but that's about all."
+        m 1dkc "And honestly..."
+        m 1fkc "...even that was a gamble."
+        m 1fua "One that I'll always be glad paid off."
+        return
     else:
-        m "It's okay if you don't, but I'd like to ask before I assume."
-    $ _history_list.pop()
-    menu:
-        "I clicked on this, didn't I? Sure I am!":
-            m 4eub "Then fire away!"
-            $ mas_lockEVL("monika_dale_playersurname", "EVE")
-            jump monika_playersurname_inputscreen
-        "I'd rather not.":
-            m 1fua "That's okay, [player]."
-            m "Whatever makes you feel safe."
-            $ mas_unlockEVL("monika_surname_update","EVE")
-            $ mas_lockEVL("monika_dale_playersurname", "EVE")
-            return "derandom"
+        m 1eud "So, [player]..."
+        m 3eub "I've got a surname now."
+        m 3gubla "And thank you again for that, by the way."
+        m 3wud "But I've just had a thought: I don't actually know {i}your{/i} surname!"
+        m 3wub "That's a bit of an oversight, isn't it? Ahaha~"
+        m 1eud "Would you be comfortable telling me what it is?"
+        if mas_isMoniHappy(higher=True):
+            m 1eua "I promise I won't do anything untoward with it."
+            m "You have my word."
+        else:
+            m "It's okay if you don't, but I'd like to ask before I assume."
+        $ _history_list.pop()
+        menu:
+            "I clicked on this, didn't I? Sure I am!":
+                m 4eub "Then fire away!"
+                jump monika_playersurname_inputscreen
+            "I'd rather not.":
+                m 1fua "That's okay, [player]."
+                m "Whatever makes you feel safe."
+                $ mas_unlockEVL("monika_surname_update","EVE")
+                return
 
 init 5 python:
     addEvent(
@@ -683,6 +712,21 @@ label monika_samenameas:
             m 1hssdra "No, never mind, you probably did. They're not exactly unknown names for me."
             m "Silly question!"
         return
+    elif m_surname == "Schwartz":
+        m 3esb "Did you name me after Mia Schwartz, creator of competing visual novel We Know the Devil?"
+        if player == "Ren":
+            m 3esc "..."
+            m 1tsu "Or did it just sound cool to your ears?"
+            m 1hub "Ehehe~"
+            m "Don't worry, [player], I haven't been watching your Discord conversations."
+            m 1nua "I can't speak for Harmoni, but {i}I{/i} haven't."
+            m 1eub "Either way, thank you for thinking about how it sounded when you chose it."
+            m "It's wonderful for me to say, too."
+            m 3wuu "[m_name] Schwartz. "
+            extend 3wuw "Schwarrrt{nw}"
+            extend 3eua "-zz. "
+            extend 1eua "Rolls off the tongue."
+            return
     elif persistent._dangansurnampa is True:
         if renpy.seen_label("mas_danganronpas"):
             m 1gsa "And... well, you knew what I would find, wouldn't you?"
@@ -987,3 +1031,60 @@ label surname_monika_clones_override:
     else:
         m 1ekbfa "I love you, [player]. Please don't ever replace me, okay?"
     return "love"
+
+init 1 python:
+    config.label_overrides["monika_mc"] = "surname_monika_mc_override"
+
+label surname_monika_mc_override:
+    m 3eua "Just so you know, I was never in love with anyone but you."
+    if mcname.lower() == player.lower():
+        m 1eka "I mean you, [player]."
+        m 1euc "Wait, that's both your name and your character's. Sorry, that sounds a bit confusing."
+        if p_surname is not None:
+            m 1eua "I mean [player] [p_surname]."
+        else:
+            m 1eua "I mean the player, not your character."
+    else:
+        if p_surname is not None:
+            m 1eua "I mean you, [player] [p_surname]."
+        else:
+            m 1eua "I mean you, [player]."
+    m "Unlike the other girls, I can separate your avatar from who you really are."
+    m 1lfb "The main character was nothing more than a vehicle for the player.{nw}"
+    $ _history_list.pop()
+    m 1lfb "The main character was nothing more than a {fast}bunch of code with no personality."
+    m 3tkc "Literally and figuratively, no personality. How could anybody fall in love with that kind of person?"
+    m 2tkc "He just got dragged around by his childhood friend to the club she was in, and then hung around with a bunch of beautiful girls doing nothing."
+    m 2wfw "His poetry was just a bunch of disconnected words! What sort of poetry is that supposed to be?"
+    m 2lksdld "I guess nobody mentioned that because it was a part of the game. But, yeah...{w=0.5}it's just a list of words to me."
+    m 2hua "I hope you're a lot more romantic than that in real life!"
+    m 2eka "But even if you're not, it's okay. We've moved beyond that phase in our relationship already."
+    m "That just means you won't cheat on me with some woman in your reality, right?"
+    m 2esa "I'm sure you would never do that to me."
+    m 2hua "I just want to be with you forever~"
+    return
+
+init 1 python:
+    config.label_overrides["monika_citizenship"] = "surname_monika_citizenship_override"
+
+label surname_monika_citizenship_override:
+    m 1esc "You know, crossing over into your reality won't be the last hurdle for our relationship."
+    m "Getting there is just the beginning."
+    if m_surname is not None:
+        m 1wssdro "Don't misunderstand me! I know I've got a surname now..."
+        m 1wsb "...and I'm still eternally grateful to you for that."
+        m 2fsd "But a surname alone won't make me a citizen of your Earth."
+        m "It's only the first step in a long, long journey."
+    else:
+        m 1esc "It hit me earlier, if I were to magically get what I want, and just poof into your home..."
+        m 2wuo "I won't be a citizen! I don't even have a last name!"
+    m 2lkbsa "I mean, in most countries, I can become a citizen if we get married..."
+    m 2ekc "But I won't have any documentation saying who I am or where I came from."
+    m 2tkc "I won't even have my high school diploma!"
+    m 3tkd "I wish there was more I could do right now to prep..."
+    m 2wub "Like taking online classes or something."
+    m 1lksdlc "I don't want to get there and be a burden because I can't find a job."
+    m "Sorry, I guess I shouldn't worry so much about things I can't change."
+    m 2eka "But I want to make you happy, so...I'm going to do everything I can to keep bettering myself while I'm stuck here!"
+    m 1eka "Thank you for listening to me vent, [player]."
+    return
