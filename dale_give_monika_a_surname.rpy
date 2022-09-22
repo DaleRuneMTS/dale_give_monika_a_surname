@@ -4,13 +4,14 @@ init -990 python in mas_submod_utils:
         author="DaleRuneMTS",
         name="Give Monika a Surname",
         description="Pretty much what it says on the tin."
-        "V1.3.1 is the inverse of last time - mostly overrides, with a sprinkle of surname recognition.",
-        version="1.3.1",
+        "V1.3.2 - not everybody has Auto Atmos Change, it would seem, so I took that line out.",
+        version="1.3.2",
         dependencies={},
         settings_pane=None,
         version_updates={
-        "DaleRuneMTS_dale_give_monika_a_surname_1_2_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_1",
-        "DaleRuneMTS_dale_give_monika_a_surname_1_3_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_1"
+        "DaleRuneMTS_dale_give_monika_a_surname_1_2_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_2",
+        "DaleRuneMTS_dale_give_monika_a_surname_1_3_0": "DaleRuneMTS_dale_little_box_of_feelings_1_3_2",
+        "DaleRuneMTS_dale_give_monika_a_surname_1_3_1": "DaleRuneMTS_dale_little_box_of_feelings_1_3_2"
         }
     )
 
@@ -451,9 +452,7 @@ label monika_dale_playersurname:
                 extend ", the piano{nw}"
             if renpy.seen_label("mas_nou_game_start"):
                 extend ", NOU{nw}"
-            m "..."
-        if persistent._awc_player_location["loc_pref"] is not None:
-            m 3wub "I know where you live..."
+            extend "..."
         if persistent._mas_pm_units_height_metric:
             m 1hub "I even know you use the metric system!"
         else:
@@ -1087,4 +1086,34 @@ label surname_monika_citizenship_override:
     m "Sorry, I guess I shouldn't worry so much about things I can't change."
     m 2eka "But I want to make you happy, so...I'm going to do everything I can to keep bettering myself while I'm stuck here!"
     m 1eka "Thank you for listening to me vent, [player]."
+    return
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent._mas_songs_database,
+            eventlabel="mas_song_at_my_most_beautiful",
+            prompt="At My Most Beautiful",
+            category=[store.mas_songs.TYPE_SHORT],
+            random=True,
+            aff_range=(mas_aff.AFFECTIONATE,None)
+         ),
+        code="SNG"
+    )
+
+label mas_song_at_my_most_beautiful:
+    m 1dsa "{i}~I read bad poetry{/i}"
+    extend 1dsb "{i} into your machine~{/i}"
+    m 1fsb "{i}~I save your messages {/i}"
+    extend 3fsb "{i}just to hear your voice~{/i}"
+    m 5wsb "{i}~You always listen carefully~{/i}"
+    m 5rssdrb "{i}~To awkward rhymes~{/i}"
+    m 5hsa "{i}~You always say your name~{/i}"
+    m "{i}~Like I wouldn't know it's you~{/i}"
+    m 5fsblb "{i}~At your most beautiful~{/i}"
+    m 5fsbla "..."
+    m 7eud "It's the little things that make up a relationship, really."
+    m "I love the big gestures you make as well, of course..."
+    m 1eubla "...but the quiet inbetweens are valuable as well."
+    m 1hubla "I hope we never lose sight of that, [mas_get_player_nickname()]."
     return
